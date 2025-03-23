@@ -1,3 +1,6 @@
+
+#pragma warning disable CS1591
+
 namespace FinTrack.BackgroundJobs;
 
 public class Worker : BackgroundService
@@ -21,3 +24,5 @@ public class Worker : BackgroundService
         }
     }
 }
+
+#pragma warning restore CS1591
