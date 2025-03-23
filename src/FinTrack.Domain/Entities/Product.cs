@@ -43,6 +43,21 @@ public class Product
     /// </summary>
     public Product(string name, string ticker, ProductType type, ProductCategory category, Currency currency)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new DomainException("Nome do produto é obrigatório.");
+
+        if (string.IsNullOrWhiteSpace(ticker))
+            throw new DomainException("Ticker do produto é obrigatório.");
+
+        if (currency is null)
+            throw new DomainException("Moeda do produto é obrigatória.");
+
+        if (!Enum.IsDefined(typeof(ProductType), type))
+            throw new DomainException("Tipo de produto inválido.");
+
+        if (!Enum.IsDefined(typeof(ProductCategory), category))
+            throw new DomainException("Categoria de produto inválida.");
+
         Id = Guid.NewGuid();
         Name = name;
         Ticker = ticker;
@@ -58,6 +73,9 @@ public class Product
     /// </summary>
     public void UpdatePrice(decimal newPrice)
     {
+        if (newPrice <= 0)
+            throw new DomainException("O preço deve ser maior que zero.");
+
         CurrentPrice = newPrice;
     }
 }
