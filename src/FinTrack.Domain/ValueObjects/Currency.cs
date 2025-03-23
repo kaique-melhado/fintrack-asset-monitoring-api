@@ -21,6 +21,9 @@ public class Currency
     /// <param name="code">Código da moeda (ex: BRL).</param>
     public Currency(string code)
     {
+        if (string.IsNullOrWhiteSpace(code) || code.Length != 3)
+            throw new DomainException("Informe um código de moeda válido com 3 letras.");
+
         Code = code.ToUpper();
     }
 

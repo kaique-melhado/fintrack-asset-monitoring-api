@@ -36,6 +36,15 @@ public class PriceHistory
     /// </summary>
     public PriceHistory(Guid productId, decimal price, DateTime date, string source)
     {
+        if (string.IsNullOrWhiteSpace(source))
+            throw new ArgumentException("A fonte do histórico de preço deve ser informada.", nameof(source));
+
+        if (price <= 0)
+            throw new ArgumentException("O preço deve ser maior que zero.", nameof(price));
+
+        if (date > DateTime.UtcNow)
+            throw new ArgumentException("A data do histórico não pode ser no futuro.", nameof(date));
+
         Id = Guid.NewGuid();
         ProductId = productId;
         Price = price;
