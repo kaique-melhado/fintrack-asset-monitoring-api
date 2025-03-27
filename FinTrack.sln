@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinTrack.UnitTests", "tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinTrack.IntegrationTests", "tests\FinTrack.IntegrationTests\FinTrack.IntegrationTests.csproj", "{162D3E7A-C778-487F-89C0-C3D83DD0D210}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinTrack.Configuration", "src\FinTrack.Configuration\FinTrack.Configuration.csproj", "{0A71CC50-0FCD-480F-98EC-386485F9A52F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{162D3E7A-C778-487F-89C0-C3D83DD0D210}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{162D3E7A-C778-487F-89C0-C3D83DD0D210}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{162D3E7A-C778-487F-89C0-C3D83DD0D210}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A71CC50-0FCD-480F-98EC-386485F9A52F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A71CC50-0FCD-480F-98EC-386485F9A52F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A71CC50-0FCD-480F-98EC-386485F9A52F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A71CC50-0FCD-480F-98EC-386485F9A52F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DBD5C41C-3B70-4E1E-A6D3-0BFA3B6CAA9A} = {FA10A91C-F285-4902-8683-44483C5A46F4}
@@ -74,5 +80,6 @@ Global
 		{C728632C-4B7D-472F-B530-08B0D29A0D7B} = {FA10A91C-F285-4902-8683-44483C5A46F4}
 		{246FB5DB-F072-45D1-B9EE-B6D17AF41D51} = {6727D163-805C-4C36-968D-FBC7A9F9AAD9}
 		{162D3E7A-C778-487F-89C0-C3D83DD0D210} = {6727D163-805C-4C36-968D-FBC7A9F9AAD9}
+		{0A71CC50-0FCD-480F-98EC-386485F9A52F} = {FA10A91C-F285-4902-8683-44483C5A46F4}
 	EndGlobalSection
 EndGlobal
