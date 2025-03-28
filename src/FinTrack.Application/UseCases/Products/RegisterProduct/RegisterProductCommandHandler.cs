@@ -43,6 +43,13 @@ public sealed class RegisterProductCommandHandler : IRequestHandler<RegisterProd
 
         try
         {
+            var existingProduct = await _unitOfWork.Products.GetByTickerAsync(request.Ticker, cancellationToken);
+            if (existingProduct is not null)
+            {
+                _logger.LogWarning("Tentativa de registro com ticker duplicado: {Ticker}", request.Ticker);
+                throw new ApplicationException($"Já existe um produto registrado com o ticker '{request.Ticker}'.");
+            }
+
             var currency = new Currency(request.CurrencyCode);
 
             var product = new Product(
