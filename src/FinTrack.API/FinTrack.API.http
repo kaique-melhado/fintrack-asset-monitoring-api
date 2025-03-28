@@ -1,6 +1,11 @@
-@FinTrack.API_HostAddress = http://localhost:5017
+@FinTrack_API_HostAddress = https://localhost:44328
 
-GET {{FinTrack.API_HostAddress}}/weatherforecast/
+GET {{FinTrack_API_HostAddress}}/swagger/
+Accept: text/html
+
+###
+
+GET {{FinTrack_API_HostAddress}}/api/products
 Accept: application/json
 
 ###
