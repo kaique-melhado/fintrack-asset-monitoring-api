@@ -1,10 +1,12 @@
 ﻿using System.Reflection;
+using FinTrack.Application.Behaviors;
 using FinTrack.Domain.Interfaces;
 using FinTrack.Domain.Interfaces.Repositories;
 using FinTrack.Infrastructure.Persistence;
 using FinTrack.Infrastructure.Persistence.Context;
 using FinTrack.Infrastructure.Persistence.Repositories;
 using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,6 +50,8 @@ public static class IocConfiguration
         {
             cfg.RegisterServicesFromAssembly(applicationAssembly);
         });
+
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
         return services;
     }
