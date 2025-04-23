@@ -20,6 +20,8 @@ public class Program
 
         var app = builder.Build();
 
+        app.UseMiddleware<ExceptionMiddleware>();
+
         // Middleware do Swagger
         if (app.Environment.IsDevelopment())
         {
