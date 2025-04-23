@@ -1,15 +1,16 @@
 ﻿using System.Reflection;
-using FinTrack.Application.Behaviors;
 using FinTrack.Domain.Interfaces;
 using FinTrack.Domain.Interfaces.Repositories;
 using FinTrack.Infrastructure.Persistence;
 using FinTrack.Infrastructure.Persistence.Context;
 using FinTrack.Infrastructure.Persistence.Repositories;
+using FinTrack.Infrastructure.Services;
 using FluentValidation;
-using MediatR;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace FinTrack.Configuration.DependencyInjection;
 
@@ -51,8 +52,6 @@ public static class IocConfiguration
             cfg.RegisterServicesFromAssembly(applicationAssembly);
         });
 
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-
         return services;
     }
 
@@ -64,7 +63,9 @@ public static class IocConfiguration
     {
         var applicationAssembly = Assembly.Load("FinTrack.Application");
 
-        services.AddValidatorsFromAssembly(applicationAssembly);
+        services
+            .AddFluentValidationAutoValidation()
+            .AddValidatorsFromAssembly(applicationAssembly);
 
         return services;
     }
@@ -77,8 +78,13 @@ public static class IocConfiguration
     private static IServiceCollection ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // Registro do DbContext com string de conexão
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException("A string de conexão 'DefaultConnection' não está configurada.");
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            Log.Fatal("A string de conexão 'DefaultConnection' está vazia ou inválida.");
+            throw new InvalidOperationException("A string de conexão 'DefaultConnection' não está configurada.");
+        }
 
         services.AddDbContext<FinTrackDbContext>(options =>
         {
@@ -91,6 +97,9 @@ public static class IocConfiguration
 
         // Registro do Unit of Work
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Aplica automaticamente as migrations do Entity Framework Core
+        services.AddHostedService<MigrateDatabaseHostedService>();
 
         return services;
     }

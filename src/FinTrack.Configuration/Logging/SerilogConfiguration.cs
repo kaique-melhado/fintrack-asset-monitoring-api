@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace FinTrack.Configuration.Logging;
@@ -18,8 +17,14 @@ public static class SerilogConfiguration
     {
         return builder.UseSerilog((context, services, loggerConfig) =>
         {
-            var env = context.HostingEnvironment;
             var configuration = context.Configuration;
+            if (configuration == null)
+            {
+                Log.Fatal("A configuração do Serilog não pôde ser carregada.");
+                throw new InvalidOperationException("Falha ao carregar a configuração do Serilog.");
+            }
+
+            var env = context.HostingEnvironment;
 
             loggerConfig
                 .ReadFrom.Configuration(configuration)
