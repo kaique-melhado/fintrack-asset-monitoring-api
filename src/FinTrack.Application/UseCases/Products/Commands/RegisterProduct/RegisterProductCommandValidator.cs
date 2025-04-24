@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace FinTrack.Application.UseCases.Products.RegisterProduct;
+namespace FinTrack.Application.UseCases.Products.Commands.RegisterProduct;
 
 /// <summary>
 /// Validador para garantir que os dados do comando de registro de produto estejam corretos.
