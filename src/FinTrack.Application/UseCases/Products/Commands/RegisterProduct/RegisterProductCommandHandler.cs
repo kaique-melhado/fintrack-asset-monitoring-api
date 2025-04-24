@@ -4,7 +4,7 @@ using FinTrack.Domain.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace FinTrack.Application.UseCases.Products.RegisterProduct;
+namespace FinTrack.Application.UseCases.Products.Commands.RegisterProduct;
 
 /// <summary>
 /// Handler responsável por processar o comando de registro de produto.

@@ -1,7 +1,7 @@
 ﻿using FinTrack.Domain.Enums;
 using MediatR;
 
-namespace FinTrack.Application.UseCases.Products.RegisterProduct;
+namespace FinTrack.Application.UseCases.Products.Commands.RegisterProduct;
 
 /// <summary>
 /// Comando para registrar um novo produto no sistema.

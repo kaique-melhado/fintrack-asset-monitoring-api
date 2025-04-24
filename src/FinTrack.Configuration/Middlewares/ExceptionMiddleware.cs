@@ -63,7 +63,7 @@ public class ExceptionMiddleware
         {
             DomainException domainEx => (HttpStatusCode.BadRequest, domainEx.Message),
             ApplicationException appEx => (HttpStatusCode.BadRequest, appEx.Message),
-            KeyNotFoundException => (HttpStatusCode.NotFound, "Recurso não encontrado."),
+            KeyNotFoundException notFoundEx => (HttpStatusCode.NotFound, notFoundEx.Message),
             SqlException sqlEx => (HttpStatusCode.InternalServerError, "Erro ao acessar o banco de dados."),
             _ => (HttpStatusCode.InternalServerError, "Erro interno inesperado. Tente novamente mais tarde.")
         };

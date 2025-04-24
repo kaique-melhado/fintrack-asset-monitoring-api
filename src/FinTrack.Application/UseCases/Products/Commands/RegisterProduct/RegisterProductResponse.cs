@@ -1,4 +1,4 @@
-﻿namespace FinTrack.Application.UseCases.Products.RegisterProduct;
+﻿namespace FinTrack.Application.UseCases.Products.Commands.RegisterProduct;
 
 /// <summary>
 /// Representa a resposta do caso de uso de registro de produto.

@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using AutoFixture;
-using FinTrack.Application.UseCases.Products.RegisterProduct;
+using FinTrack.Application.UseCases.Products.Commands.RegisterProduct;
 using FinTrack.Configuration.Middlewares;
 using FinTrack.Domain.Enums;
 using FinTrack.IntegrationTests.Extensions;
