@@ -10,6 +10,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using Serilog;
 
 namespace FinTrack.Configuration.DependencyInjection;
@@ -34,6 +35,7 @@ public static class IocConfiguration
             .ConfigureApplicationServices()
             .ConfigureInfrastructure(configuration)
             .ConfigureFluentValidation()
+            .ConfigureHealthChecks(configuration)
             .ConfigureApi();
 
         return services;
@@ -114,7 +116,27 @@ public static class IocConfiguration
 
         // Swagger / OpenAPI
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+
+        //Configuração de Documentação com Swagger
+        services.AddSwaggerGen(opts =>
+        {
+            var applicationAssembly = Assembly.Load("FinTrack.API");
+            var xmlFile = $"{applicationAssembly.GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+            opts.SwaggerDoc("v1", new OpenApiInfo { Title = "FinTrackAPI", Version = "v1" });
+            opts.IncludeXmlComments(xmlPath);
+        });
+
+        return services;
+    }
+
+    private static IServiceCollection ConfigureHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        services.AddHealthChecks()
+            .AddSqlServer(connectionString!, name: "sqlserver", tags: new[] { "db", "sql", "infra" });
 
         return services;
     }
