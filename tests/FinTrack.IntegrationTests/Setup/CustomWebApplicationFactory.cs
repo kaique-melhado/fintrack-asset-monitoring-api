@@ -54,6 +54,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
     }
 
     /// <summary>
+    /// Encerra o container do banco de dados utilizado durante os testes de integração.
+    /// </summary>
+    public async Task StopSqlContainerAsync()
+    {
+        await _sqlContainer.StopAsync();
+    }
+
+    /// <summary>
     /// Encerra o container após os testes.
     /// </summary>
     async Task IAsyncLifetime.DisposeAsync()

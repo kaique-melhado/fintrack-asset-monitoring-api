@@ -119,4 +119,74 @@ public class RegisterProductTests : IntegrationTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         await response.ShouldContainFluentValidationError(expectedError);
     }
+
+    [Theory(DisplayName = "Deve retornar erro ao registrar produto com tipo inválido")]
+    [InlineData(null)]
+    [InlineData(0)]
+    [InlineData(99)]
+    public async Task Should_Return_Error_When_ProductType_Is_Invalid(int productType)
+    {
+        // Arrange
+        var payload = new
+        {
+            name = "Produto Inválido",
+            ticker = "INV01",
+            type = productType,
+            category = 1,
+            currencyCode = "BRL"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/products", payload);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        await response.ShouldContainFluentValidationError("Tipo de produto inválido.");
+    }
+
+    [Theory(DisplayName = "Deve retornar erro ao registrar produto com categoria inválida")]
+    [InlineData(null)]
+    [InlineData(0)]
+    [InlineData(99)]
+    public async Task Should_Return_Error_When_ProductCategory_Is_Invalid(int productCategory)
+    {
+        // Arrange
+        var payload = new
+        {
+            name = "Produto Inválido",
+            ticker = "INV01",
+            type = 1,
+            category = productCategory,
+            currencyCode = "BRL"
+        };
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/products", payload);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        await response.ShouldContainFluentValidationError("Categoria de produto inválida.");
+    }
+
+    [Fact(DisplayName = "Deve retornar erro interno ao ocorrer falha de persistência")]
+    public async Task Should_Return_InternalServerError_When_Persistence_Fails()
+    {
+        // Arrange
+        var command = new RegisterProductCommand(
+            Name: "Novo Produto",
+            Ticker: "FAIL01",
+            Type: ProductType.Stock,
+            Category: ProductCategory.VariableIncome,
+            CurrencyCode: "BRL"
+        );
+
+        await _factory.StopSqlContainerAsync();
+
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/products", command);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        await response.ShouldContainErrorResponse("Erro interno inesperado. Tente novamente mais tarde.", (int)HttpStatusCode.InternalServerError);
+    }
 }
