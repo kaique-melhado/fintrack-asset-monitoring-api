@@ -1,0 +1,59 @@
+name: CI - Build and Test Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    name: Build, Test and Coverage
+
+    env:
+      DOTNET_VERSION: '9.0.100'
+
+    steps:
+      # Etapa 1 - Clonar o repositório
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Etapa 2 - Instalar SDK do .NET
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Etapa 3 - Restaurar pacotes
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Etapa 4 - Compilar a solução
+      - name: Build solution
+        run: dotnet build --no-restore --configuration Release
+
+      # Etapa 5 - Executar testes unitários com cobertura
+      - name: Run unit tests with coverage
+        run: >
+          dotnet test tests/FinTrack.UnitTests
+          --no-build
+          --configuration Release
+          --collect:"XPlat Code Coverage"
+          --results-directory ./TestResults/UnitTests
+
+      # Etapa 6 - Executar testes de integração com cobertura
+      - name: Run integration tests with coverage
+        run: >
+          dotnet test tests/FinTrack.IntegrationTests
+          --no-build
+          --configuration Release
+          --collect:"XPlat Code Coverage"
+          --results-directory ./TestResults/IntegrationTests
+
+      # Etapa 7 - Publicar artefato de cobertura
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-results
+          path: ./TestResults/**/coverage.cobertura.xml
