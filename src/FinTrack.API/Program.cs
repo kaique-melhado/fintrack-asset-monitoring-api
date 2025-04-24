@@ -12,28 +12,32 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Configura Serilog
+        // Configuração do Serilog
         builder.Host.UseSerilogConfiguration();
 
-        // Injeção de dependências da aplicação
+        // Injeção de dependências e serviços customizados da aplicação
         builder.Services.AddConfigurations(builder.Configuration);
 
         var app = builder.Build();
 
+        // Middleware para tratamento de exceções
         app.UseMiddleware<ExceptionMiddleware>();
 
-        // Middleware do Swagger
+        // Ativa o Swagger apenas em ambiente de desenvolvimento
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
 
-        // HTTPS + Auth
+        // Middleware para redirecionamento HTTPS e controle de autorização
         app.UseHttpsRedirection();
         app.UseAuthorization();
 
-        // Mapeamento de endpoints de controllers
+        // Endpoint de HealthCheck para monitoramento da API e infraestrutura
+        app.MapHealthChecks("/health");
+
+        // Mapeamento dos endpoints baseados em controllers
         app.MapControllers();
 
         // Execução da aplicação

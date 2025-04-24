@@ -1,13 +1,14 @@
 ﻿using FinTrack.Application.UseCases.Products.Commands.RegisterProduct;
 using FinTrack.Application.UseCases.Products.Queries.GetProductById;
 using FinTrack.Application.UseCases.Products.Queries.Responses;
+using FinTrack.Configuration.Middlewares;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinTrack.API.Controllers;
 
 /// <summary>
-/// Controlador responsável por gerenciar operações relacionadas a produtos.
+/// Controlador responsável por gerenciar operações de produtos financeiros, como cadastro e consulta.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -25,13 +26,30 @@ public class ProductsController : ControllerBase
     }
 
     /// <summary>
-    /// Registra um novo produto no sistema.
+    /// Cadastra um novo produto no sistema.
     /// </summary>
+    /// <remarks>
+    /// Exemplo de request:
+    /// 
+    ///     POST /api/products
+    ///     {
+    ///         "name": "Banco PAN",
+    ///         "ticker": "BPAN4",
+    ///         "type": 1,
+    ///         "category": 1,
+    ///         "currencyCode": "BRL"
+    ///     }
+    ///     
+    /// </remarks>
     /// <param name="command">Comando contendo os dados do produto.</param>
-    /// <returns>Retorna os dados do produto registrado.</returns>
+    /// <returns>Retorna os dados do produto cadastrado.</returns>
     /// <response code="201">Produto criado com sucesso.</response>
+    /// <response code="400">Dados inválidos ou regras de negócio violadas.</response>
+    /// <response code="500">Erro interno inesperado.</response>
     [HttpPost]
     [ProducesResponseType(typeof(RegisterProductResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RegisterProduct([FromBody] RegisterProductCommand command)
     {
         var result = await _mediator.Send(command);
@@ -43,15 +61,16 @@ public class ProductsController : ControllerBase
     /// </summary>
     /// <param name="id">Identificador do produto.</param>
     /// <returns>Produto encontrado ou erro 404 caso não exista.</returns>
-    /// <response code="200">Produto encontrado.</response>
-    /// <response code="404">Produto não encontrado.</response>
+    /// <response code="200">Produto encontrado com sucesso.</response>
+    /// <response code="404">Produto não encontrado para o ID informado.</response>
+    /// <response code="500">Erro interno inesperado.</response>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ProductDetailsResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetProductById(Guid id)
     {
         var result = await _mediator.Send(new GetProductByIdQuery(id));
         return Ok(result);
     }
-
 }
