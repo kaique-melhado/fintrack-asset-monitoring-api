@@ -1,21 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\FinTrack.Application\FinTrack.Application.csproj" />
-    <ProjectReference Include="..\FinTrack.Domain\FinTrack.Domain.csproj" />
-    <ProjectReference Include="..\FinTrack.Messages\FinTrack.Messages.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FinTrack.Application\FinTrack.Application.csproj" />
+		<ProjectReference Include="..\FinTrack.Domain\FinTrack.Domain.csproj" />
+		<ProjectReference Include="..\FinTrack.Messages\FinTrack.Messages.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.3" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
+	</ItemGroup>
 
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>

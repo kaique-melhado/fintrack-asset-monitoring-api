@@ -1,9 +1,9 @@
 ﻿using FinTrack.Domain.Exceptions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using System.Net;
 using System.Text.Json;
 
@@ -64,7 +64,7 @@ public class ExceptionMiddleware
             DomainException domainEx => (HttpStatusCode.BadRequest, domainEx.Message),
             ApplicationException appEx => (HttpStatusCode.BadRequest, appEx.Message),
             KeyNotFoundException notFoundEx => (HttpStatusCode.NotFound, notFoundEx.Message),
-            SqlException sqlEx => (HttpStatusCode.InternalServerError, "Erro ao acessar o banco de dados."),
+            PostgresException sqlEx => (HttpStatusCode.InternalServerError, "Erro ao acessar o banco de dados."),
             _ => (HttpStatusCode.InternalServerError, "Erro interno inesperado. Tente novamente mais tarde.")
         };
 
