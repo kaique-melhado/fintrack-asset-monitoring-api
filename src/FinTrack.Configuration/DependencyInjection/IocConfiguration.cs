@@ -90,7 +90,7 @@ public static class IocConfiguration
 
         services.AddDbContext<FinTrackDbContext>(options =>
         {
-            options.UseSqlServer(connectionString);
+            options.UseNpgsql(connectionString);
         });
 
         // Registro de repositórios
@@ -136,7 +136,7 @@ public static class IocConfiguration
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         services.AddHealthChecks()
-            .AddSqlServer(connectionString!, name: "sqlserver", tags: new[] { "db", "sql", "infra" });
+            .AddNpgSql(connectionString!, name: "postgresql", tags: new[] { "db", "sql", "infra" });
 
         return services;
     }

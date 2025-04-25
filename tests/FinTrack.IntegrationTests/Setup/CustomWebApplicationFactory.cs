@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Testcontainers.MsSql;
+using Testcontainers.PostgreSql;
 
 namespace FinTrack.IntegrationTests.Setup;
 
@@ -12,7 +12,7 @@ namespace FinTrack.IntegrationTests.Setup;
 /// </summary>
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder().Build();
+    private readonly PostgreSqlContainer _sqlContainer = new PostgreSqlBuilder().Build();
 
     /// <summary>
     /// Obtém a string de conexão atual do banco de dados criado dinamicamente.
@@ -38,7 +38,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
             // Injeta um novo contexto com a connection string do container
             services.AddDbContext<FinTrackDbContext>(options =>
             {
-                options.UseSqlServer(_sqlContainer.GetConnectionString());
+                options.UseNpgsql(_sqlContainer.GetConnectionString());
             });
         });
 
