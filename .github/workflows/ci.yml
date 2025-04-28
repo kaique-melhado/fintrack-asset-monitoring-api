@@ -1,39 +1,70 @@
-name: CI - Build and Test Pipeline
+name: CI - Build, Test and Coverage Pipeline
 
+# Gatilhos para iniciar o pipeline
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop ] # Sempre que houver push nas branches main ou develop
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop ] # Sempre que houver PR direcionado para main ou develop
+
+env:
+  DOTNET_VERSION: '9.0.100' # Define a versão do SDK .NET que será usada em todos os jobs
 
 jobs:
-  build-test:
-    runs-on: ubuntu-latest
-    name: Build, Test and Coverage
-
-    env:
-      DOTNET_VERSION: '9.0.100'
+  # ----------------------------------
+  # Job 1: Build do projeto
+  # ----------------------------------
+  build:
+    name: Build Solution
+    runs-on: ubuntu-latest # Utiliza uma máquina virtual Ubuntu padrão
 
     steps:
-      # Etapa 1 - Clonar o repositório
+      # Clona o repositório para o ambiente da VM
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      # Etapa 2 - Instalar SDK do .NET
+      # Instala a versão específica do SDK .NET
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      # Etapa 3 - Restaurar pacotes
+      # Restaura as dependências (pacotes NuGet)
       - name: Restore dependencies
         run: dotnet restore
 
-      # Etapa 4 - Compilar a solução
+      # Compila a solução em modo Release
       - name: Build solution
         run: dotnet build --no-restore --configuration Release
 
-      # Etapa 5 - Executar testes unitários com cobertura
+  # ----------------------------------
+  # Job 2: Executar Testes Unitários
+  # ----------------------------------
+  unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    needs: build # Só roda se o build anterior for bem-sucedido
+
+    steps:
+      # Clona o repositório 
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Instala o SDK do .NET
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Restaura as dependências
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Compila novamente para garantir consistência 
+      - name: Build solution
+        run: dotnet build --no-restore --configuration Release
+
+      # Executa os testes unitários e coleta cobertura de código
       - name: Run unit tests with coverage
         run: >
           dotnet test tests/FinTrack.UnitTests
@@ -42,7 +73,52 @@ jobs:
           --collect:"XPlat Code Coverage"
           --results-directory ./TestResults/UnitTests
 
-      # Etapa 6 - Executar testes de integração com cobertura
+      # Publica os resultados da cobertura como artefato
+      - name: Upload Unit Test Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-tests-coverage
+          path: ./TestResults/UnitTests/**/coverage.cobertura.xml
+
+  # ----------------------------------
+  # Job 3: Executar Testes de Integração
+  # ----------------------------------
+  integration-tests:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+    needs: build # Só roda se o build anterior for bem-sucedido
+
+    steps:
+      # Clona o repositório 
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      # Instala o SDK do .NET
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Restaura as dependências
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Injeta a variável de ambiente correta para a conexão com PostgreSQL, baseado no branch
+      - name: Setup PostgreSQL Connection String
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "POSTGRESQL_CONNECTION=${{ secrets.POSTGRESQL_CONNECTION_PROD }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "POSTGRESQL_CONNECTION=${{ secrets.POSTGRESQL_CONNECTION_DEV }}" >> $GITHUB_ENV
+          else
+            echo "POSTGRESQL_CONNECTION=${{ secrets.POSTGRESQL_CONNECTION_STAGING }}" >> $GITHUB_ENV
+          fi
+
+      # Compila novamente para garantir consistência
+      - name: Build solution
+        run: dotnet build --no-restore --configuration Release
+
+      # Executa os testes de integração com o banco real (via Testcontainers)
       - name: Run integration tests with coverage
         run: >
           dotnet test tests/FinTrack.IntegrationTests
@@ -51,9 +127,9 @@ jobs:
           --collect:"XPlat Code Coverage"
           --results-directory ./TestResults/IntegrationTests
 
-      # Etapa 7 - Publicar artefato de cobertura
-      - name: Upload coverage artifacts
+      # Publica os resultados da cobertura dos testes de integração
+      - name: Upload Integration Test Coverage
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-results
-          path: ./TestResults/**/coverage.cobertura.xml
+          name: integration-tests-coverage
+          path: ./TestResults/IntegrationTests/**/coverage.cobertura.xml

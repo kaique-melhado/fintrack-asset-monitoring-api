@@ -9,7 +9,8 @@
 		<WarningsAsErrors>CS8618;CS8602</WarningsAsErrors>
 		<Deterministic>true</Deterministic>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	</PropertyGroup>
+	  <UserSecretsId>e8bef729-035b-41e9-8292-04b29627bc20</UserSecretsId>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="9.0.0" />
