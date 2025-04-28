@@ -23,9 +23,12 @@ public class Program
         // Middleware para tratamento de exceções
         app.UseMiddleware<ExceptionMiddleware>();
 
-        // Ativa o Swagger apenas em ambiente de desenvolvimento
         if (app.Environment.IsDevelopment())
         {
+            // Carrega segredos do usuário para a configuração durante o desenvolvimento.
+            builder.Configuration.AddUserSecrets<Program>();
+
+            // Ativa o Swagger apenas em ambiente de desenvolvimento
             app.UseSwagger();
             app.UseSwaggerUI();
         }

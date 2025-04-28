@@ -80,12 +80,12 @@ public static class IocConfiguration
     private static IServiceCollection ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // Registro do DbContext com string de conexão
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = Environment.GetEnvironmentVariable("POSTGRESQL_CONNECTION") ?? configuration.GetConnectionString("DefaultConnection");
 
         if (string.IsNullOrWhiteSpace(connectionString))
         {
-            Log.Fatal("A string de conexão 'DefaultConnection' está vazia ou inválida.");
-            throw new InvalidOperationException("A string de conexão 'DefaultConnection' não está configurada.");
+            Log.Fatal("A string de conexão 'POSTGRESQL_CONNECTION' ou 'DefaultConnection' não foi configurada.");
+            throw new InvalidOperationException("A string de conexão não foi configurada corretamente.");
         }
 
         services.AddDbContext<FinTrackDbContext>(options =>
@@ -133,7 +133,13 @@ public static class IocConfiguration
 
     private static IServiceCollection ConfigureHealthChecks(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = Environment.GetEnvironmentVariable("POSTGRESQL_CONNECTION") ?? configuration.GetConnectionString("DefaultConnection");
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            Log.Fatal("A string de conexão 'POSTGRESQL_CONNECTION' ou 'DefaultConnection' não foi configurada.");
+            throw new InvalidOperationException("A string de conexão não foi configurada corretamente.");
+        }
 
         services.AddHealthChecks()
             .AddNpgSql(connectionString!, name: "postgresql", tags: new[] { "db", "sql", "infra" });
