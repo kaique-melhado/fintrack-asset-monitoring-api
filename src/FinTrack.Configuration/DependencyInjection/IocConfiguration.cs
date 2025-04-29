@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using FinTrack.Configuration.Extensions;
 using FinTrack.Domain.Interfaces;
 using FinTrack.Domain.Interfaces.Repositories;
 using FinTrack.Infrastructure.Persistence;
@@ -11,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Serilog;
 
 namespace FinTrack.Configuration.DependencyInjection;
 
@@ -80,13 +80,7 @@ public static class IocConfiguration
     private static IServiceCollection ConfigureInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // Registro do DbContext com string de conexão
-        var connectionString = Environment.GetEnvironmentVariable("POSTGRESQL_CONNECTION") ?? configuration.GetConnectionString("DefaultConnection");
-
-        if (string.IsNullOrWhiteSpace(connectionString))
-        {
-            Log.Fatal("A string de conexão 'POSTGRESQL_CONNECTION' ou 'DefaultConnection' não foi configurada.");
-            throw new InvalidOperationException("A string de conexão não foi configurada corretamente.");
-        }
+        var connectionString = configuration.GetSafeConnectionString();
 
         services.AddDbContext<FinTrackDbContext>(options =>
         {
@@ -133,13 +127,7 @@ public static class IocConfiguration
 
     private static IServiceCollection ConfigureHealthChecks(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = Environment.GetEnvironmentVariable("POSTGRESQL_CONNECTION") ?? configuration.GetConnectionString("DefaultConnection");
-
-        if (string.IsNullOrWhiteSpace(connectionString))
-        {
-            Log.Fatal("A string de conexão 'POSTGRESQL_CONNECTION' ou 'DefaultConnection' não foi configurada.");
-            throw new InvalidOperationException("A string de conexão não foi configurada corretamente.");
-        }
+        var connectionString = configuration.GetSafeConnectionString();
 
         services.AddHealthChecks()
             .AddNpgSql(connectionString!, name: "postgresql", tags: new[] { "db", "sql", "infra" });
